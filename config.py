@@ -1,6 +1,6 @@
 # config.py
 # AZURE_OPENAI_ENDPOINT = "https://aiportalapi.stu-platform.live/jpe"
-# AZURE_OPENAI_KEY = "sk-mhPRejyBQGwdMqMob8SIwQ"
+# AZURE_OPENAI_KEY = "sk-7mB_8TPvxyB1hbWfklo_iQ"
 # AZURE_OPENAI_DEPLOYMENT = "GPT-4o-mini"  # name of your deployed model
 
 # # Email (nếu dùng Gmail notifier)
@@ -16,7 +16,10 @@
 # config.py
 import os
 from pathlib import Path
+from dotenv import load_dotenv
 
+# Load các biến môi trường từ file .env
+load_dotenv()
 # ==== Azure OpenAI (ENV) ====
 AZURE_OPENAI_ENDPOINT    = os.getenv("AZURE_OPENAI_ENDPOINT", "")
 AZURE_OPENAI_KEY         = os.getenv("AZURE_OPENAI_KEY", "")

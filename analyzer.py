@@ -149,7 +149,8 @@ def summarize_articles(articles: List[Dict[str, Any]], topic: str) -> str:
         fn = msg.function_call.name
         args = json.loads(msg.function_call.arguments or "{}")
         result = _tool_router(fn, args)
-        cm.add("function", json.dumps({"name": fn, "result": result}, ensure_ascii=False))
+        cm.add(role="function", name=fn, content=json.dumps(result, ensure_ascii=False))
+
 
         follow = client.chat.completions.create(
             model=AZURE_OPENAI_DEPLOYMENT,

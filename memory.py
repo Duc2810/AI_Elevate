@@ -14,11 +14,11 @@ class ConversationManager:
         self.turns = 0
         self.session_id = str(uuid.uuid4())
 
-    def add(self, role: str, content: str):
-        self.history.append({"role": role, "content": content})
-        self.turns += 1
-        if self.turns >= SUMMARY_TRIGGER_TURNS and len(self.history) > HISTORY_WINDOW:
-            self._summarize()
+    def add(self, role: str, content: str, name: str = None):
+        msg = {"role": role, "content": content}
+        if name:
+            msg["name"] = name
+        self.history.append(msg)
 
     def _summarize(self):
         snippet = self.history[-SUMMARY_KEEP_LAST:]
