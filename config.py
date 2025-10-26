@@ -26,6 +26,8 @@ AZURE_OPENAI_KEY         = os.getenv("AZURE_OPENAI_KEY", "")
 AZURE_OPENAI_API_VERSION = os.getenv("AZURE_OPENAI_API_VERSION", "2024-07-01-preview")
 AZURE_OPENAI_DEPLOYMENT  = os.getenv("AZURE_OPENAI_DEPLOYMENT", "gpt-4o-mini")  # deployment name của bạn
 
+# ==== GNEWS API (ENV) ====
+GNEWS_API_KEY            = os.getenv("GNEWS_API_KEY", "")
 # ==== Model params ====
 TEMPERATURE = float(os.getenv("TEMPERATURE", "0.2"))
 TOP_P       = float(os.getenv("TOP_P", "1.0"))

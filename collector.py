@@ -1,8 +1,10 @@
 # collector.py
 import feedparser
-from gnews import GNews
+import requests
+from config import GNEWS_API_KEY
 
 def collect_rss(feeds, limit=5):
+    """Collect latest articles from a list of RSS feeds."""
     articles = []
     for url in feeds:
         feed = feedparser.parse(url)
@@ -10,24 +12,49 @@ def collect_rss(feeds, limit=5):
             articles.append({
                 "title": entry.title,
                 "link": entry.link,
-                "summary": entry.summary if hasattr(entry, "summary") else ""
+                "summary": getattr(entry, "summary", ""),
+                "source": feed.feed.get("title", "Unknown Source")
             })
     return articles
 
-# def collect_google_news(topic, limit=5):
-#     google_news = GNews(language='en', country='US', period='1d', max_results=limit)
-#     results = google_news.get_news(topic)
-#     articles = [{"title": r["title"], "link": r["url"], "summary": r["description"]} for r in results]
-#     return articles
 
-def collect_all(topic="global news"):
+def collect_gnews(topic, limit=5):
+    """Collect articles from GNews API for a given topic."""
+    url = f"https://gnews.io/api/v4/search?q={topic}&lang=vi&max={limit}&token={GNEWS_API_KEY}"
+    r = requests.get(url)
+    if r.status_code != 200:
+        print(f"[GNews] Failed to fetch articles: {r.status_code}")
+        return []
+
+    data = r.json()
+    if "articles" not in data:
+        print("[GNews] Unexpected response format")
+        return []
+
+    articles = []
+    for a in data["articles"]:
+        articles.append({
+            "title": a.get("title", ""),
+            "link": a.get("url", ""),
+            "summary": a.get("description", ""),
+            "source": a.get("source", {}).get("name", "GNews")
+        })
+    return articles
+
+
+def collect_all(topic, limit=5):
+    """Collect articles from both RSS feeds and GNews API."""
     rss_feeds = [
-        "https://vnexpress.net/rss/tin-moi-nhat.rss",  # VNExpress – latest news
-        "https://tuoitre.vn/rss/tin-moi-nhat.rss",  # Tuoi Tre – latest news
-        "https://vietnamnews.vn/rss/general.rss",  # Vietnam News English site
-        "https://thanhnien.vn/rss/home.rss",  # Thanh Nien – general news
-        "https://nhandan.vn/rss/home.rss"  # Nhan Dan – official newspaper
+        "https://vnexpress.net/rss/tin-moi-nhat.rss",
+        "https://tuoitre.vn/rss/tin-moi-nhat.rss",
+        "https://vietnamnews.vn/rss/general.rss",
+        "https://thanhnien.vn/rss/home.rss",
+        "https://nhandan.vn/rss/home.rss"
     ]
-    articles = collect_rss(rss_feeds) #+ collect_google_news(topic)
-    print(f"[Collector] Collected {len(articles)} articles")
+
+    rss_articles = collect_rss(rss_feeds, limit)
+    gnews_articles = collect_gnews(topic, limit)
+    articles = rss_articles + gnews_articles
+
+    print(f"[Collector] Collected {len(articles)} articles total")
     return articles
